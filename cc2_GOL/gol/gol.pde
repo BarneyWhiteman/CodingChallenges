@@ -1,20 +1,20 @@
-int[] cells;
+
+int cells[];
 int scale = 20;
 int size;
+
+boolean paused = false;
+boolean delete = false;
 
 float chance = 0.5;
 
 int fr = 10;
 
-boolean paused = false;
-boolean delete = false;
-
 void setup() {  
   size(720, 720);
   size = width/scale;
-  cells = new int[size * size];
   
-  noStroke();
+  cells = new int[size * size];
   
   for(int i = 0; i < cells.length; i ++) {
     if(random(1) < chance) {
@@ -22,8 +22,7 @@ void setup() {
     } else {
       cells[i] = 0;
     }
-  }
-  
+  }  
 }
 
 void draw() {
@@ -34,6 +33,20 @@ void draw() {
   if(frameCount % fr == 0 && !paused) {
     nextCells();
   }
+}
+
+int numN(int i, int j) {
+  int num = 0;
+  
+  for(int x = -1; x <= 1; x ++) {
+    for(int y = -1; y <= 1; y ++) {
+      if(x == 0 && y == 0) continue;
+      int ni = i + x;
+      int nj = j + y;
+      num += cells[pos(ni, nj)];
+    }
+  }
+  return num;
 }
 
 void nextCells() {
@@ -55,16 +68,17 @@ void nextCells() {
   cells = next.clone();
 }
 
-void setCell(int i, int j, int v) {
-  cells[pos(i, j)] = v;
-}
-
 void drawGrid() {
   stroke(150);
   for(int i = 0; i < size; i ++) {
     line(i * scale, 0, i * scale, height);
     line(0, i * scale, width, i * scale);
   }
+  noFill();
+  stroke(255, 0, 0);
+  int x = mouseX/scale;
+  int y = mouseY/scale;
+  rect(x * scale, y * scale, scale, scale);
 }
 
 void drawCells() {
@@ -79,43 +93,28 @@ void drawCells() {
   }
 }
 
-int numN(int x, int y) {
-  int num = 0;
-  
-  for(int i = -1; i <= 1; i ++) {
-    for(int j = -1; j <= 1; j ++) {
-      if(i == 0 && j == 0) continue;
-      int ni = x + i;
-      int nj = y + j;
-      
-      if(ni >= 0 && ni < size) {
-        num += cells[pos(ni, nj)];
-      }
-    }
-  }
-  
-  return num;
-}
-
 void zero() {
   for(int i = 0; i < cells.length; i ++) {
     cells[i] = 0;
-  }
+  }  
 }
 
 int pos(int i, int j) {
   i = constrain(i, 0, size - 1);
   j = constrain(j, 0, size - 1);
-  return i + j * size; 
+  
+  return i + j * size;
+}
+
+void setCell(int i, int j, int v) {
+  cells[pos(i, j)] = v;
 }
 
 void mouseDragged() {
-  int i = mouseX/scale;
-  int j = mouseY/scale;
   if(delete) {
-    setCell(i, j, 0);
+    setCell(mouseX/scale, mouseY/scale, 0);
   } else {
-    setCell(i, j, 1);
+    setCell(mouseX/scale, mouseY/scale, 1);
   }
 }
 
@@ -126,11 +125,11 @@ void keyPressed() {
   if(key == 's') {
     fr = constrain(fr + 1, 1, 20);
   }
-  if(key == 'd') {
-    delete = !delete;
-  }
   if(key == ' ') {
     paused = !paused;
+  }
+  if(key == 'd') {
+    delete = !delete;
   }
   if(key == 'c') {
     zero();
