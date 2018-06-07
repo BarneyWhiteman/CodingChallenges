@@ -6,7 +6,7 @@ int count = 16;
 float offset;
 
 void setup() {
-  size(1080, 1080);
+  size(1000, 1000);
   background(0);
   stroke(50);
   offset  = (2 * PI)/count;
